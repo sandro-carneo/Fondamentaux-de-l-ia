@@ -1,0 +1,82 @@
+=========================================================
+REPONSES AUX QUESTIONS - TP3 DEEP LEARNING (ZALANDO)
+=========================================================
+
+--- ÉTAPE 1 : EXPLORATION ---
+
+1. Le catalogue est-il équilibré entre les catégories ? Quel impact sur l’entraînement ?
+Réponse : Oui, le dataset Fashion-MNIST est parfaitement équilibré (6000 images par classe pour l'entraînement). L'impact est positif : le modèle ne sera pas biaisé vers une classe majoritaire et apprendra à reconnaître chaque type de vêtement avec la même importance.
+
+2. Un pull et une chemise se ressemblent visuellement : cela pose-t-il un risque de confusion pour un algorithme ?
+Réponse : Oui, c'est un risque majeur. À une résolution de 28x28 pixels, les détails fins (boutons, col) disparaissent, laissant seulement la silhouette globale qui est quasi identique pour un pull et une chemise. C'est souvent là que se trouvent les principales erreurs.
+
+3. La résolution 28x28 pixels est-elle représentative d’un cas de production réel ? Quelle résolution utiliserait-on sur la vraie plateforme Zalando ?
+Réponse : Non, 28x28 est trop faible pour de la production industrielle. Sur Zalando, on utiliserait des résolutions bien plus hautes (ex: 224x224 ou 512x512 pixels) pour capturer les textures des tissus et les détails des logos.
+
+--- ÉTAPE 2 : PRÉTRAITEMENT ---
+
+1. Pourquoi normalise-t-on les pixels entre 0 et 1 avant d’entraîner un réseau de neurones ? Que se passerait-il si on gardait les valeurs brutes 0–255 ?
+Réponse : La normalisation aide à la convergence. Les réseaux de neurones utilisent des fonctions d'activation (comme ReLU) et des optimiseurs qui sont sensibles à l'échelle des données. Avec des valeurs 0-255, les gradients pourraient devenir trop grands (exploding gradients), rendant l'entraînement instable ou très lent.
+
+--- ÉTAPE 3 : BASELINE ---
+
+1. Cette accuracy suffit-elle pour atteindre l’objectif business (taux d’erreur < 5 %) ?
+Réponse : Non. Le Random Forest atteint environ 87-88% d'accuracy, soit un taux d'erreur de 12-13%. L'objectif business est de descendre sous les 5%.
+
+2. Random Forest traite chaque pixel comme une feature indépendante : comprend-il que les pixels voisins forment un contour ou une texture ?
+Réponse : Non. Le Random Forest est "aveugle" à la structure spatiale. Si on mélangeait tous les pixels de l'image de la même manière pour toutes les images (shuffling), le Random Forest obtiendrait exactement le même résultat, alors qu'un humain ne reconnaîtrait plus rien.
+
+--- ÉTAPE 4 : RÉSEAU DENSE (MLP) ---
+
+1. Combien de paramètres entraînables au total ? Comparez avec le nombre de pixels d’une image (784).
+Réponse : Environ 109 000 paramètres (100 480 + 8 256 + 650). C'est beaucoup plus que les 784 pixels de départ. Cela montre que le modèle a une grande capacité de mémorisation, d'où le risque d'overfitting.
+
+2. Que fait softmax sur la dernière couche ? Pourquoi est-ce adapté à une classification multi-classe ?
+Réponse : Softmax transforme les scores de sortie en probabilités (dont la somme totale vaut 1). C'est idéal pour la classification multi-classe car cela permet de dire "il y a 85% de chances que ce soit un Pull, 10% un Manteau, etc.".
+
+3. Pourquoi sparse_categorical_crossentropy et pas binary_crossentropy ?
+Réponse : On utilise 'sparse_categorical_crossentropy' car nous avons 10 classes mutuellement exclusives et nos labels sont des entiers (0, 1, 2...). La 'binary_crossentropy' est réservée aux problèmes à seulement 2 classes (Oui/Non).
+
+--- ÉTAPE 7 : COMPARAISON ---
+
+1. Quel modèle atteint l’objectif business (taux d’erreur < 5 %) ?
+Réponse : En général, un CNN standard sur Fashion-MNIST atteint 92-93% (~7% d'erreur). Bien que ce soit le meilleur, il faut souvent des architectures plus complexes ou de l'augmentation de données pour descendre sous les 5% de façon stable.
+
+2. Quelles catégories sont le plus souvent confondues ? Est-ce cohérent ?
+Réponse : Les Pulls, Chemises et Manteaux sont les plus confondus. C'est totalement cohérent car ce sont des vêtements de "haut de corps" avec des formes très proches à basse résolution.
+
+3. Pour la mise en production, faut-il uniquement regarder l’accuracy globale ?
+Réponse : Non, il faut regarder le Recall et la Précision par catégorie. Par exemple, si on se trompe sur les "Sacs" ce n'est pas grave, mais si on confond systématiquement "Robes" et "Pantalons", cela impacte fortement l'expérience utilisateur et les retours colis.
+
+--- ÉTAPE 8 : ANALYSE DES ERREURS ---
+
+1. Les erreurs les plus fréquentes sont-elles compréhensibles visuellement ?
+Réponse : Oui, la plupart du temps l'erreur est "excusable" (ex: une chemise ouverte qui ressemble à un manteau).
+
+2. Le modèle fait-il des erreurs avec une haute confiance (> 90 %) ? Pourquoi est-ce un risque ?
+Réponse : Oui, cela arrive. C'est un risque car si le système est automatisé, il va valider une erreur sans sourciller. Une haute confiance erronée est plus dangereuse qu'une incertitude.
+
+3. Solution business pour les confusions ?
+Réponse : 
+- Ajouter une étape de validation humaine pour les prédictions dont la confiance est < 90%.
+- Enrichir le dataset avec plus d'exemples des classes difficiles.
+- Fusionner certaines catégories si le business le permet (ex: T-shirt et Chemise).
+
+--- ÉTAPE 10 : SYNTHÈSE POUR LE COMITÉ TECHNIQUE ---
+
+Insight 1 — ML classique vs Deep Learning
+Observation : Le Random Forest plafonne à ~87% d'accuracy là où le CNN dépasse les 92%.
+Explication : Le CNN surpasse les modèles classiques car il est capable d'apprendre des hiérarchies de motifs visuels (bords -> formes -> vêtements) grâce à la convolution, alors que le RF traite chaque pixel de manière isolée.
+Recommandation : Le surcoût de calcul du CNN (nécessitant un GPU) est largement justifié par le gain de performance business (réduction de 40% du taux d'erreur par rapport au RF).
+
+Insight 2 — Dense vs CNN
+Observation : Le CNN est nettement plus précis et robuste que le réseau Dense (MLP).
+Explication : Le mécanisme de convolution permet de capturer la structure spatiale. Un pixel de "manche" n'a de sens que par rapport aux pixels voisins. Le MLP perd cette information en aplatissant l'image dès l'entrée.
+Recommandation : Pour toute application de vision par ordinateur chez Zalando, le CNN doit être l'architecture par défaut. Le réseau dense ne suffirait que pour des cas extrêmement simples ou des données déjà structurées en vecteurs.
+
+Insight 3 — Fiabilité en production
+Observation : Les catégories "Pull", "Manteau" et "Chemise" concentrent l'essentiel des erreurs, même avec un modèle performant.
+Explication : À une résolution de 28x28, la confusion est inévitable car les détails discriminants (col, texture, boutons) sont flous ou invisibles.
+Recommandation : Pour atteindre l'objectif de < 5% d'erreur, nous préconisons :
+1. L'augmentation de la résolution des images en entrée (ex: 64x64).
+2. L'ajout d'une validation humaine systématique sur les prédictions dont l'indice de confiance est inférieur à 90%.

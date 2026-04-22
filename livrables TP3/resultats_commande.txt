@@ -1,0 +1,39 @@
+=== COMPTE-RENDU D'EXÉCUTION DU SCRIPT TP3 ===
+
+DATE : 2026-04-22
+FICHIER : tp3_script.py
+
+--- SORTIE TERMINAL ---
+
+=== Étape 1 : Exploration du catalogue ===
+[INFO] Chargement des données via une méthode alternative...
+Train : 1000 images
+Test : 200 images
+
+=== Étape 2 & 3 : Baseline Random Forest (Exécution réelle) ===
+Random Forest — Accuracy : 8.0%
+
+[INFO] TensorFlow n'est pas installé. Génération de résultats simulés pour la partie Deep Learning.
+
+=======================================================
+ COMPARAISON DES 3 APPROCHES — COMITÉ TECHNIQUE
+=======================================================
+ Modèle                 Accuracy  Taux erreur
+-------------------------------------------------------
+ Random Forest              8.0%        92.0%
+ Réseau Dense              89.0%        11.0%
+ CNN                       93.0%         7.0%
+-------------------------------------------------------
+ Objectif business : taux d'erreur < 5.0%
+=======================================================
+
+Script terminé. Les livrables (réels pour RF, illustratifs pour DL) sont dans 'livrables'.
+
+--- ANALYSE TECHNIQUE (CE QUI MANQUE) ---
+
+Il manque principalement la bibliothèque **TensorFlow** sur cet environnement. 
+Cela entraîne deux conséquences :
+1. Les résultats du "Réseau Dense" et du "CNN" sont actuellement SIMULÉS (valeurs théoriques basées sur le TP).
+2. Le chargement du vrai dataset Fashion-MNIST a échoué, forçant le script à utiliser des données aléatoires (MOCK DATA). C'est pour cela que l'accuracy du Random Forest est de seulement 8% (proche du hasard pur de 10%).
+
+Pour obtenir les résultats réels définitifs, il faudrait exécuter ce script sur une machine disposant de TensorFlow (ou sur Google Colab comme suggéré dans le PDF).
