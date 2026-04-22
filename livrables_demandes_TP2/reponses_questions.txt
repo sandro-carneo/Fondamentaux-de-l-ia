@@ -1,0 +1,77 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║          RÉPONSES AUX QUESTIONS PÉDAGOGIQUES DU TP2 - CAS A (CHURN)          ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+--------------------------------------------------------------------------------
+   SECTION 1 : ÉTAPE 2 - PRÉPARATION DES DONNÉES
+--------------------------------------------------------------------------------
+
+1. Votre dataset est-il équilibré ? Quelle proportion de chaque classe ?
+   > Le dataset est déséquilibré.
+   > Répartition : ~26,5 % de clients ayant résilié (churn = 1) 
+   >            contre ~73,5 % de clients fidèles (churn = 0).
+
+2. Y a-t-il des variables potentiellement sensibles (âge, localisation, genre…) ? Faut-il les exclure ?
+   > Oui, le dataset contient des variables sensibles (gender, SeniorCitizen, Partner, Dependents).
+   > Justification : Selon le RGPD et l'AI Act, si ces données ne sont pas indispensables à l'offre commerciale, il est préférable de les exclure pour prévenir les biais discriminatoires (ex: offres différentes selon le genre).
+
+3. Quel prétraitement avez-vous appliqué et pourquoi ?
+   > Nettoyage : Suppression des lignes incomplètes ("TotalCharges" vide).
+   > Encodage (One-Hot) : Conversion des catégories textuelles en binaires (0/1) car les modèles ML ne traitent que des données numériques.
+   > Normalisation (StandardScaler) : Mise à l'échelle indispensable pour la Régression Logistique afin d'éviter que les variables à fortes valeurs (TotalCharges) n'écrasent les autres.
+
+--------------------------------------------------------------------------------
+   SECTION 2 : ÉTAPE 3 - MODÉLISATION ET COMPARAISON
+--------------------------------------------------------------------------------
+
+1. Quel modèle obtient les meilleures performances sur votre cas ?
+   > La Régression Logistique et XGBoost obtiennent les meilleures performances globales (F1-macro ~0.73, Accuracy ~80 %).
+
+2. La Régression Logistique est-elle compétitive malgré sa simplicité ?
+   > Oui, elle est extrêmement compétitive sur ces données tabulaires car les relations clés (comme le lien entre prix, ancienneté et fidélité) sont majoritairement linéaires.
+
+3. Quel modèle choisiriez-vous pour un déploiement en production ?
+   > Choix : Régression Logistique.
+   > Justification : Rapidité d'inférence, coût de maintenance quasi-nul et interprétabilité totale des poids, ce qui est idéal pour piloter des campagnes marketing.
+
+--------------------------------------------------------------------------------
+   SECTION 3 : ÉTAPE 4 - ÉVALUATION ET MATRICE DE CONFUSION
+--------------------------------------------------------------------------------
+
+1. Identifiez les faux positifs et faux négatifs dans votre matrice de confusion.
+   > Faux Positifs : Le modèle prédit un départ alors que le client reste.
+   > Faux Négatifs : Le modèle prédit une fidélité alors que le client part.
+
+2. Dans votre contexte métier (churn), lequel est le plus coûteux ? Pourquoi ?
+   > Les Faux Négatifs sont les plus coûteux. Perdre un abonné sans avoir tenté de le retenir est une perte de revenu sur le long terme. Un Faux Positif (une promo envoyée par erreur) coûte beaucoup moins cher.
+
+3. Votre meilleur modèle est-il suffisant pour un déploiement réel ?
+   > Il est robuste, mais nécessite un monitoring MLOps (surveillance du Data Drift) et un test A/B préalable avec le service marketing pour valider les gains réels.
+
+--------------------------------------------------------------------------------
+   SECTION 4 : ÉTAPE 5 - EXPLICATION DU MODÉLE (SHAP)
+--------------------------------------------------------------------------------
+
+1. Quelles sont les 3 variables les plus influentes selon SHAP ?
+   > 1. Contract_Month-to-month (Contrat sans engagement)
+   > 2. Tenure (Ancienneté du client)
+   > 3. InternetService_Fiber optic (Client ayant la fibre)
+
+2. Ces variables sont-elles cohérentes avec votre intuition métier ?
+   > Absolument. L'absence d'engagement et la fibre (souvent plus chère ou sujette à concurrence) sont des facteurs classiques de départ.
+
+3. Que faire si une variable sensible apparaît parmi les plus importantes ?
+   > Il est impératif d'auditer le modèle et probablement de supprimer la variable du dataset pour garantir l'équité du système et sa conformité légale (AI Act).
+
+--------------------------------------------------------------------------------
+   SECTION 5 : ÉTAPE 6 - ÉTHIQUE ET CONFORMITÉ (AI ACT)
+--------------------------------------------------------------------------------
+
+1. Votre système nécessite-t-il un audit de conformité avant déploiement ?
+   > Non obligatoire (classé en "Risque Limité/Minimal" par l'AI Act). Cependant, une validation interne par le DPO (Data Protection Officer) est fortement conseillée.
+
+2. Les personnes affectées par les décisions ont-elles un droit de recours ?
+   > Oui, selon l'article 22 du RGPD. Un client peut contester une décision automatisée et demander une intervention humaine.
+
+3. Quel organisme de contrôle surveille ce type de système ?
+   > En France, la CNIL (Commission Nationale de l'Informatique et des Libertés) assure la régulation et le contrôle de ces traitements de données.

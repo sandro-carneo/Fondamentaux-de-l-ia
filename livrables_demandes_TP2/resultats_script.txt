@@ -1,0 +1,58 @@
+==================================================
+ETAPE 2 - Préparation des données (Cas A - Churn)
+==================================================
+Forme : (7043, 21)
+
+Distribution cible :
+Churn
+No     5174
+Yes    1869
+Name: count, dtype: int64
+
+Colonnes : ['customerID', 'gender', 'SeniorCitizen', 'Partner', 'Dependents', 'tenure', 'PhoneService', 'MultipleLines', 'InternetService', 'OnlineSecurity', 'OnlineBackup', 'DeviceProtection', 'TechSupport', 'StreamingTV', 'StreamingMovies', 'Contract', 'PaperlessBilling', 'PaymentMethod', 'MonthlyCharges', 'TotalCharges', 'Churn']
+
+Après nettoyage : (7032, 21)
+
+Taux de churn : 26.6% -> dataset déséquilibré
+-> Utiliser F1-macro plutôt qu'accuracy seule
+
+Train : 5625 | Test : 1407
+Nombre de features : 30
+
+==================================================
+ETAPE 3 - Modélisation : 3 modèles à comparer
+==================================================
+Logistic Regression    -> Accuracy : 80.4%  |  F1-macro : 0.739  |  F1-weighted : 0.800
+Random Forest          -> Accuracy : 78.8%  |  F1-macro : 0.712  |  F1-weighted : 0.781
+XGBoost                -> Accuracy : 77.8%  |  F1-macro : 0.709  |  F1-weighted : 0.776
+
+=== TABLEAU COMPARATIF ===
+                     accuracy  f1_macro  f1_weighted
+Logistic Regression     0.804     0.739        0.800
+Random Forest           0.788     0.712        0.781
+XGBoost                 0.778     0.709        0.776
+
+[+] Graphique de comparaison des modèles sauvegardé : comparaison_modeles.png
+
+==================================================
+ETAPE 4 - Évaluation approfondie
+==================================================
+=== RAPPORT DÉTAILLÉ - Logistic Regression ===
+              precision    recall  f1-score   support
+
+           0       0.85      0.89      0.87      1033
+           1       0.65      0.57      0.61       374
+
+    accuracy                           0.80      1407
+   macro avg       0.75      0.73      0.74      1407
+weighted avg       0.80      0.80      0.80      1407
+
+[+] Matrice de confusion sauvegardée : confusion_matrix.png
+[+] Graphique d'évolution RF sauvegardé : rf_evolution.png
+
+==================================================
+ETAPE 5 - Explicabilité SHAP
+==================================================
+[+] Graphique SHAP sauvegardé : shap_summary.png
+
+>>> Exécution terminée avec succès ! Toutes les informations et images sont générées.

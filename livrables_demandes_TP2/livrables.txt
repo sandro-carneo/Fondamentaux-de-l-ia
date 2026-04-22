@@ -1,0 +1,23 @@
+===================================================================
+│  CAS : A (Churn Clients)       MODÈLE RETENU : Régression Logistique │
+├─────────────────────────────────────────────────────────────────┤
+│  MÉTRIQUES FINALES                                              │
+│  L'accuracy est typiquement autour de 80%                       │
+│  Le F1-macro autour de 0.73 et F1-weighted autour de 0.79       │
+├─────────────────────────────────────────────────────────────────┤
+│  TOP 3 VARIABLES (estimations SHAP)                             │
+│  1. Contract_Month-to-month   2. tenure   3. InternetService_Fiber optic
+├─────────────────────────────────────────────────────────────────┤
+│  AI ACT : Niveau Minimal/Limité  —  Ne prend pas de décisions 
+│           critiques impactant les droits fondamentaux.          │
+├─────────────────────────────────────────────────────────────────┤
+│  LIMITE PRINCIPALE IDENTIFIÉE : Difficulté à bien prédire la 
+│  classe minoritaire (les "vrais" churners), d'où beaucoup de 
+│  Faux Négatifs.                                                 │
+===================================================================
+
+Images générées (livrables graphiques) :
+- comparaison_modeles.png
+- confusion_matrix.png
+- rf_evolution.png
+- shap_summary.png
